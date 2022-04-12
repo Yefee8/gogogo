@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+</head>
+<body style="background: black;">
+
+<script>
+    let isDied = false;
+    let config = {
+        type: Phaser.AUTO,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: {y: 200}
+            }
+        },
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    let game = new Phaser.Game(config);
+
+    function preload() {
+        this.load.setBaseURL('https://yefee8.github.io/runrunrun');
+        this.load.image('dude', '/char.svg');
+        this.load.image('ground', '/platform.svg');
+        this.load.image('deadplatform', '/deadplatform.svg');
+        this.load.image('winthing', '/endplatform.svg');
+        this.load.image('particle', '/particle.svg');
+        this.load.image('goneplatform', '/gonePlatform.svg')
+    }
+
+    let platforms;
+
+    function create() {
+
+        function die() {
+            location.reload()
+        }
+
+
+        function win(){
+            window.location.href = '/level2.html'
+        }
+        let count = 0
+        function createAnPlatform(){
+        count++
+        if(count === 1){
+            platforms.create(1250, window.innerHeight - 235, 'ground').refreshBody();
+        }
+        }
+
+        // badthings
+        badthings = this.physics.add.staticGroup();
+
+        // End Platforms
+        endplatforms = this.physics.add.staticGroup();
+
+        // Platform things
+        platforms = this.physics.add.staticGroup();
+
+        //gone platform
+        gonePlatform = this.physics.add.staticGroup();
+
+        // Particle things
+        let particles = this.add.particles('particle');
+
+
+
+        // main platform
+        platforms.create(0, window.innerHeight, 'ground').setScale(100, 1).refreshBody();
+
+
+
+
+
+        // Platforms
+        platforms.create(500, window.innerHeight - 100, 'ground').refreshBody();
+        platforms.create(1000, window.innerHeight - 100, 'ground').refreshBody();
+        badthings.create(1500, window.innerHeight - 100, 'deadplatform').refreshBody();
+        platforms.create(500, window.innerHeight - 235, 'ground').refreshBody();
+        gonePlatform.create(500, window.innerHeight - 300, 'goneplatform').refreshBody();
+        endplatforms.create(1500, window.innerHeight - 400, 'winthing')
+        // End Platforms
+        let emitter = particles.createEmitter({
+            speed: 100,
+            scale: {start: 0.5, end: 0},
+            blendMode: 'ADD'
+        });
+
+
+        emitter.setPosition(1500, window.innerHeight - 400);
+
+        // Player things
+        player = this.physics.add.sprite(100, 100, 'dude');
+        player.setPosition(0, window.innerHeight - 150);
+        player.setScale(0.5)
+        player.setBounce(0);
+        player.setCollideWorldBounds(true);
+        player.body.setGravityY(200)
+
+        // Physics add
+        this.physics.add.collider(player, platforms);
+        this.physics.add.overlap(player, endplatforms, win, null, this)
+        this.physics.add.overlap(player, badthings, die, null, this);
+        this.physics.add.overlap(player, gonePlatform, createAnPlatform, null, this);
+
+    }
+
+    let isJumped = false
+
+    function update() {
+        if (!isDied) {
+            let cursors = this.input.keyboard.createCursorKeys();
+            if (cursors.left.isDown) {
+                player.setVelocityX(-260);
+
+            }
+            else if (cursors.right.isDown) {
+                player.setVelocityX(260);
+            } else {
+                player.setVelocityX(0);
+            }
+
+            if (cursors.up.isDown && player.body.touching.down) {
+                let i = 0;
+                player.setVelocityY(-330);
+
+                if (!isJumped) {
+                    let a = setInterval(() => {
+                        i++;
+                        if (i === 180) {
+                            player.angle = 0;
+                            clearInterval(a);
+                        }
+                        player.angle = i;
+                    }, 5)
+                }
+
+                isJumped = true
+                setTimeout(() => {
+                    isJumped = false;
+                }, 900)
+            }
+        }
+        else{
+            return;
+        }
+    }
+
+
+</script>
+
+</body>
+</html>
