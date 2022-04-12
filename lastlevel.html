@@ -52,7 +52,7 @@
 
 
         function win() {
-            alert('congr')
+            alert('Congratulations, you finished the game by wasting 15 minutes of your time.')
         }
 
 
@@ -81,6 +81,12 @@
 
         // Particle things
         let particles = this.add.particles('particle');
+        let emitter = particles.createEmitter({
+            speed: 100,
+            scale: {start: 0.5, end: 0},
+            blendMode: 'ADD'
+        });
+        emitter.setPosition(window.innerWidth/2, 900);
 
         // Player things
         player = this.physics.add.sprite(100, 100, 'dude');
