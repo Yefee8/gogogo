@@ -39,7 +39,13 @@
     let platforms;
 
     function create() {
+        if(localStorage.getItem('alertedfirst')){
 
+        }
+        else{
+            alert('this game needs minimum 1750 width & 900 height')
+            localStorage.setItem('alertedfirst', 'alerted')
+        }
         function die() {
             location.reload()
         }
